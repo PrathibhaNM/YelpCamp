@@ -1,0 +1,22 @@
+GeoJson
+
+1. GeoJson is supported by MongoDB
+2. The geometrywhich we get from mapbox API is GeoJson which helps us to add many methods provided by mongo on it
+3. For GeoJson we need to change the schema 
+
+
+const campgrounds={features : <%-JSON.stringify(campgrounds)%>}
+
+we have addedthe features here becausr the cluster map will always look for the features object while displaying
+
+VIRTUAL - PROPERTIES
+
+since while displaying a message /popup when we click on a unclustered point on the cluster map we require a message that should be in the 
+'properties' object. So create a virtual of properties and add a link that displays a information about particular campground in that virtual
+
+
+const opts = { toJSON: { virtuals: true } };
+
+By default, Mongoose does not include virtuals when you convert a document to JSON. For example, if you pass a document to Express' res.json() function, virtuals will not be included by default.
+To include virtuals in res.json(), you need to set the toJSON schema option to { virtuals: true }.
+since we are converting campgrounds to json we need to add this sentence in models to access 'properties.popUpMessage' in clusterMap.js
