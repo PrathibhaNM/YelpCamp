@@ -1,7 +1,9 @@
-if(process.env.NODE_ENV !== "production")
-{
-    require('dotenv').config()
-}
+ if(process.env.NODE_ENV !== "production")
+ {
+     require('dotenv').config()
+ }
+
+
 
 // console.log(process.env.CLOUDINARY_CLOUD_NAME)
 // console.log(process.env.CLOUDINARY_KEY)
@@ -24,12 +26,15 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const User = require('./models/user')
 const mongoSanitize = require('express-mongo-sanitize');
+const MongoStore = require('connect-mongo')
 
 const campgroundRoutes = require('./Routes/campgrounds.js')
 const reviewRoutes = require('./Routes/reviews.js')
 const userRoutes = require('./Routes/user.js')
+//const MongoDBStore = require('connect-mongo')
+const dbUrl = 'mongodb://localhost:27017/yelp-camp'
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp')
+mongoose.connect(dbUrl)
 const db= mongoose.connection
 db.on("error", console.error.bind(console,"connection error :"))
 db.once("open", () =>
@@ -46,7 +51,24 @@ app.use(methodOverride('_method'))
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(mongoSanitize());
 
+const store = MongoStore.create({
+
+    mongoUrl : dbUrl,
+   touchAfter : 24 * 60 * 60,
+   crypto : {
+     secret : 'thisshouldbeabettersecret!',
+   }
+
+})
+
+store.on("error", function(e)
+{
+    console.log("SESSION STORE ERROR", e)
+})
+
 const sessionConfig = {
+    store,
+    name : 'session',
     secret :'thisshouldbeabettersecret!',
     resave : false,
     saveUninitialized : true,
